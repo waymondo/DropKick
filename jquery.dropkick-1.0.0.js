@@ -56,10 +56,7 @@
       startSpeed : 1000,  // I recommend a high value here, I feel it makes the changes less noticeable to the user
       theme  : false,
       change : false
-    },
-
-    // Make sure we only bind keydown on the document once
-    keysBound = false
+    }
   ;
 
   // Called by using $('foo').dropkick();
