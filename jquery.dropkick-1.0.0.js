@@ -53,9 +53,10 @@
 
     // Some nice default values
     defaults = {
-      startSpeed : 1000,  // I recommend a high value here, I feel it makes the changes less noticeable to the user
-      theme  : false,
-      change : false
+      startSpeed : 0,
+      theme      : false,
+      change     : $.noop,
+      onRender   : $.noop
     }
   ;
 
@@ -264,7 +265,7 @@
 
     reset = reset || false;
 
-    if (data.settings.change && !reset) {
+    if (!reset) {
       data.settings.change.call($select, value, label);
     }
   }
@@ -298,7 +299,7 @@
   /**
    * Turn the dropdownTemplate into a jQuery object and fill in the variables.
    */
-  function _build (tpl, view) {
+  function _build(tpl, view) {
     var
       // Template for the dropdown
       template  = tpl,
@@ -329,6 +330,8 @@
 
     $dk = $(template);
     $dk.find('.dk_options_inner').html(options.join(''));
+
+    view.settings.onRender.call($dk);
 
     return $dk;
   }
