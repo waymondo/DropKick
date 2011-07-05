@@ -150,7 +150,7 @@
     });
   };
 
-  // Allows dynamic theme chnages
+  // Allows dynamic theme changes
   methods.theme = function (newTheme) {
     var
       $select   = $(this),
