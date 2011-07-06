@@ -80,11 +80,19 @@ var
     speed  : 1000,               // Fade-in speed for DropKicks.
     theme  : 'dk_theme_default', // Default css theme applied to .dk_container
     change : $.noop,             // <select> list onchange proxy
-    close  : $.noop,             // Triggered when a DropKick is closed
-    open   : $.noop,             // Triggered when a DropKick is opened
+    close  : _handleClose,             // Triggered when a DropKick is closed
+    open   : _handleOpen,             // Triggered when a DropKick is opened
     load   : $.noop              // Triggered when the menu is rendered and inserted into the DOM
   }
 ;
+
+function _handleOpen() {
+  this.show();
+}
+
+function _handleClose() {
+  this.hide();
+}
 
 // Hide <select>'s that are about to be dropkicked in the face
 // Helps reduce the change of a flash of unstyled content (fouc)
@@ -221,6 +229,8 @@ function _handleDkEvent(evt, data) {
   switch(event) {
     case dkEvents.close:
     case dkEvents.open:
+      cb.call(this.find('.' + dkClasses.options), evt);
+    break;
     case dkEvents.load:
       cb.call(this, evt);
     break;
@@ -249,7 +259,7 @@ function _closeDropKick(dkEl) {
 function _openDropKick(dkEl) {
   var callbacks = dkEl.data('dropkick:callbacks');
 
-  _closeAll();
+  _closeAll(callbacks.close);
 
   dkEl.addClass(dkClasses.open);
   dkEl.trigger(dkEvent, [{
@@ -263,7 +273,8 @@ function _openDropKick(dkEl) {
  *
  * Closes all currently open dropdowns
  */
-function _closeAll() {
+function _closeAll(cb) {
+  
   $('.' + dkClasses.container).removeClass(dkClasses.open);
 }
 

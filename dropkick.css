@@ -158,9 +158,6 @@
 .dk_open {
   position: relative;
 }
-  .dk_open .dk_options {
-    display: block;
-  }
   .dk_open .dk_label {
     color: inherit;
   }

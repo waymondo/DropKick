@@ -72,14 +72,15 @@
   <script type="text/javascript" charset="utf-8">
     $(function () {
       $('.default').dropkick({
+        speed: 100,
         change: function (value, label) {
-          // console.log(value, label);
+          console.log(value, label);
         },
         open : function () {
-          console.log(this, ' opened.');
+          this.show();
         },
-        close : function () {
-          console.log(this, ' closed.');
+        close: function () {
+          this.fadeOut(100);
         },
         load : function () {
           console.log(this, ' loaded.');
