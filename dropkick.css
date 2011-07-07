@@ -108,10 +108,17 @@
   }
   .dk_options a:hover,
   .dk_option_current a {
-    background-color: #0084c7;
     border-bottom-color: #004c72;
-    color: #fff;
     text-decoration: none;
+  }
+  .dk_options a:hover {
+    background-color: #efefef;
+    color: #0084c7;
+  }
+  .dk_option_current a,
+  .dk_option_current a:hover {
+    background-color: #0084c7;
+    color: #fff;
     text-shadow: rgba(0, 0, 0, .5) 0 1px 0;
   }
 

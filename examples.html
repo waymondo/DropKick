@@ -6,7 +6,6 @@
   <title>JamieLottering/DropKick @ GitHub</title>
   <link rel="stylesheet" href="example/example.css" type="text/css">
   <link rel="stylesheet" href="dropkick.css" type="text/css">
-  <link href='http://fonts.googleapis.com/css?family=Carter+One&v1' rel='stylesheet' type='text/css'>
   
   <style type="text/css">
     /* Two custom themes */
@@ -72,18 +71,8 @@
   <script type="text/javascript" charset="utf-8">
     $(function () {
       $('.default').dropkick({
-        speed: 100,
         change: function (value, label) {
           console.log(value, label);
-        },
-        open : function () {
-          this.show();
-        },
-        close: function () {
-          this.fadeOut(100);
-        },
-        load : function () {
-          console.log(this, ' loaded.');
         }
       });
 
@@ -110,7 +99,6 @@
 </head>
 
 <body>
-  <a href="http://github.com/JamieLottering/DropKick"><img style="position: fixed; top: 0; right: 0; border: 0; z-index: 15;" src="https://d3nwyuy0nl342s.cloudfront.net/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub"></a>
 
   <div class="header">
     <div class="header_inner group">
@@ -120,7 +108,7 @@
   <div class="content">
     <div class="examples part">
       <div class="example">
-        <h2>Default Options</h2>
+        <h2><label for="country">Default Options</label></h2>
         <fieldset>
           <form action="#" method="post" accept-charset="utf-8" class="example_form">
             <select name="country" class="default">
@@ -134,7 +122,7 @@
               </optgroup>
             </select>
             <select name="state" class="default" tabindex="3">
-              <option value="" selected="selected">Try Me, Too!</option>
+              <option value="">Try Me, Too!</option>
               <option value="AL">Alabama</option>
               <option value="AK">Alaska</option>
               <option value="AZ">Arizona</option>
@@ -184,7 +172,7 @@
               <option value="WA">Washington</option>
               <option value="WV">West Virginia</option>
               <option value="WI">Wisconsin</option>
-              <option value="WY">Wyoming</option>
+              <option value="WY" selected="selected">Wyoming</option>
             </select>
             <input type="reset" name="some_name" value="Reset" id="some_name">
             <p><script src="https://gist.github.com/1062688.js?file=dropkick_example_default.js"></script></p>
