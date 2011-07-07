@@ -74,6 +74,12 @@
         change: function (value, label) {
           console.log(value, label);
         },
+        open: function () {
+          this.fadeIn(100);
+        },
+        close: function () {
+          this.slideUp(100);
+        },
         load: function () {
           $('.dk_class_country').focus();
         }
@@ -86,10 +92,7 @@
       });
 
       $('.custom_theme').dropkick({
-        theme: 'black',
-        change: function (value, label) {
-          $(this).dropkick('theme', value);
-        }
+        theme: 'black'
       });
 
       $('.example_form').bind('reset', function (e) {

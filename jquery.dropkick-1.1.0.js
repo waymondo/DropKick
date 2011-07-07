@@ -63,6 +63,19 @@ var
     options   : 'dk_options'
   },
 
+  dkEls = {
+    open      : '.dk_open',
+    focus     : '.dk_focus',
+    container : '.dk_container',
+    toggle    : '.dk_toggle',
+    label     : '.dk_label',
+    current   : '.dk_option_current',
+    selected  : '.dk_option_selected',
+    dropdown  : '.dk_options',
+    menu      : '.dk_options_inner',
+    options   : '.dk_options'
+  },
+
   // This is the main dk:event catchall
   dkEvent = 'dk:event',
 
@@ -77,36 +90,28 @@ var
 
   // Some of the best defaults I have ever seen...
   defaults = {
-    speed  : 1000,               // Fade-in speed for DropKicks.
+    speed  : 0,                  // Fade-in speed for DropKicks.
     theme  : 'dk_theme_default', // Default css theme applied to .dk_container
     change : $.noop,             // <select> list onchange proxy
-    close  : _handleClose,       // Triggered when a DropKick is closed
-    open   : _handleOpen,        // Triggered when a DropKick is opened
+    close  : function () {       // Triggered when a DropKick is closed
+      this.hide();
+    },
+    open   : function () {       // Triggered when a DropKick is opened
+      this.show();
+    },
     load   : $.noop              // Triggered when the menu is rendered and inserted into the DOM
   }
 ;
 
-function _handleOpen() {
-  this.show();
-}
-
-function _handleClose() {
-  this.hide();
-}
-
-// Hide <select>'s that are about to be dropkicked in the face
-// Helps reduce the change of a flash of unstyled content (fouc)
-// doc.documentElement.className = doc.documentElement.className + ' dk_fouc';
-
 // Bind Events
 $(function () {
-  $('.' + dkClasses.container).live(dkEvent, function (e, data) {
+  $(dkEls.container).live(dkEvent, function (e, data) {
     _handleDkEvent.call($(this), e, data);
   }).live('focus.dk', function (e) {
     $(this).addClass(dkClasses.focus);
   });
 
-  $('.' + dkClasses.toggle).live('mousedown', function (e) {
+  $(dkEls.toggle).live('mousedown', function (e) {
     var dkEl = $(this).parents('.dk_container').first();
 
     if(dkEl.hasClass(dkClasses.open)) {
@@ -119,8 +124,8 @@ $(function () {
     return false;
   });
 
-  $('.' + dkClasses.options).find('a').live('click', function (e) {
-    _save($(this), $(this).parents('.' + dkClasses.container).first());
+  $(dkEls.options).find('a').live('click', function (e) {
+    _save($(this), $(this).parents(dkEls.container).first());
     e.preventDefault();
     return false;
   });
@@ -158,7 +163,7 @@ $(function () {
     }
   }).bind('click.dropkick', function (e) {
     var target = $(e.target);
-    if (!target.parents('.' + dkClasses.container).length && $('.' + dkClasses.open).length) {
+    if (!target.parents(dkEls.container).length && $(dkEls.open).length) {
       _closeAll();
     }
   });
@@ -235,12 +240,12 @@ function _handleDkEvent(evt, data) {
 
   switch(data.event) {
     case dkEvents.close:
-      callback.call(this.find('.' + dkClasses.options), evt);
+      callback.call(this.find(dkEls.options), evt);
       this.removeClass(dkClasses.open);
     break;
 
     case dkEvents.open:
-      callback.call(this.find('.' + dkClasses.options), evt);
+      callback.call(this.find(dkEls.options), evt);
       this.addClass(dkClasses.open);
     break;
 
@@ -291,8 +296,6 @@ function _closeDropKick(dkEl) {
     event: dkEvents.open,
     cb: callbacks.open
   }]);
-
-  _scrollMenu(dkEl.find('.dk_option_selected'), dkEl);
 }
 
 /**
@@ -313,7 +316,7 @@ function _closeAll() {
  * Scroll a DropKick menu to a specified location
  */
 function _scrollMenu(toEl, dkEl) {
-  var inner = dkEl.find('.' + dkClasses.menu);
+  var inner = dkEl.find(dkEls.menu);
   var to = toEl.prevAll('li').length * toEl.prevAll('li').outerHeight();
 
   if (typeof to === 'number') {
@@ -327,7 +330,7 @@ function _scrollMenu(toEl, dkEl) {
  * Adds a 'current' class to the current option
  */
 function _setCurrent(curEl, dkEl) {
-  dkEl.find('.' + dkClasses.current).removeClass(dkClasses.current);
+  dkEl.find(dkEls.current).removeClass(dkClasses.current);
   curEl.addClass(dkClasses.current);
 
   _scrollMenu(curEl, dkEl);
@@ -339,7 +342,7 @@ function _setCurrent(curEl, dkEl) {
  * Updates the .dk_label text
  */
 function _updateLabel(label, dkEl) {
-  dkEl.find('.' + dkClasses.label).text(label);
+  dkEl.find(dkEls.label).text(label);
 }
 
 /**
@@ -389,36 +392,36 @@ function _save(optEl, dkEl) {
 function _renderMenu(tpl, view) {
   var
     // Template for the dropdown
-    html = tpl,
-    rendered = [],
+    html         = tpl,
+    currentClass = [dkClasses.current, dkClasses.selected].join(' '),
+    rendered     = [],
     // Holder of the dropdowns options
     options = view.options,
     dkEl
   ;
 
   html = html.replace(/{{ id }}/g, view.id);
-  html = html.replace('{{ label }}', view.label);
-  html = html.replace('{{ tabindex }}', view.tabindex);
-  html = html.replace('{{ width }}', view.width);
-  html = html.replace('{{ theme }}', view.theme);
+  html = html.replace(/{{ label }}/, view.label);
+  html = html.replace(/{{ tabindex }}/, view.tabindex);
+  html = html.replace(/{{ width }}/, view.width);
+  html = html.replace(/{{ theme }}/, view.theme);
 
   if (options && options.length) {
     for (var i = 0, l = options.length; i < l; i++) {
       var
         optionEl  = $(options[i]),
-        current   = [dkClasses.current, dkClasses.selected].join(' '),
         tpl       = optionTpl
       ;
 
-      tpl = tpl.replace('{{ value }}', optionEl.val());
-      tpl = tpl.replace('{{ current }}', (optionEl.val() === view.original) ? current : '');
-      tpl = tpl.replace('{{ text }}', optionEl.text());
+      tpl = tpl.replace(/{{ value }}/, optionEl.val());
+      tpl = tpl.replace(/{{ current }}/, (optionEl.val() === view.original) ? currentClass : '');
+      tpl = tpl.replace(/{{ text }}/, optionEl.text());
 
       rendered[rendered.length] = tpl;
     }
   }
 
-  rendered = html.replace('{{ inner }}', rendered.join(''));
+  rendered = html.replace(/{{ inner }}/, rendered.join(''));
   return rendered;
 }
 
@@ -426,7 +429,6 @@ methods.init = function (settings) {
   settings = $.extend({}, defaults, settings);
 
   return this.each(function () {
-    console.time('dk_');
 
     // Only allow this to run once
     if ($(this).data('dropkick') && $(this).data('dropkick').id) {
@@ -496,7 +498,7 @@ methods.init = function (settings) {
 
     // Hide the <select> and place the dkEl object in front of it
     el.before(dkEl);
-    el.fadeOut(100, function () {
+    el.fadeOut(0, function () {
       // Stash some data attributes
       el.data('dropkick', data);
       dkEl.data('dropkick', data);
@@ -504,7 +506,7 @@ methods.init = function (settings) {
 
       // blur events don't support .live()
       dkEl.bind('blur.dk', function (e) {
-        $(this).removeClass(dkClasses.focus);
+        dkEl.removeClass(dkClasses.focus);
       });
 
       // Trigger a dk:load event
@@ -526,7 +528,7 @@ methods.init = function (settings) {
  * Reset all DropKicks and <selects> within their parent form
  */
 methods.reset = function () {
-  var el = $(this), dkEls = el.data('dropkick').parentForm.find('.' + dkClasses.container);
+  var el = $(this), dkEls = el.data('dropkick').parentForm.find(dkEls.container);
 
   dkEls.each(function () {
     var dkEl = $(this), resetEl = dkEl.find('.dk_option_selected');
