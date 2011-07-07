@@ -73,6 +73,9 @@
       $('.default').dropkick({
         change: function (value, label) {
           console.log(value, label);
+        },
+        load: function () {
+          $('.dk_class_country').focus();
         }
       });
 
@@ -93,7 +96,6 @@
         $('.default').dropkick('reset');
       });
 
-      $('.dk_container').first().focus();
     });
   </script>
 </head>
@@ -172,7 +174,7 @@
               <option value="WA">Washington</option>
               <option value="WV">West Virginia</option>
               <option value="WI">Wisconsin</option>
-              <option value="WY" selected="selected">Wyoming</option>
+              <option value="WY">Wyoming</option>
             </select>
             <input type="reset" name="some_name" value="Reset" id="some_name">
             <p><script src="https://gist.github.com/1062688.js?file=dropkick_example_default.js"></script></p>

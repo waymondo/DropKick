@@ -31,7 +31,7 @@ var
 
   // Default HTML template for dropkick dropdowns
   dkTpl = [
-    '<div class="dk_container" id="dk_container_{{ id }}" tabindex="{{ tabindex }}">',
+    '<div class="dk_container dk_class_{{ id }} {{ theme }}" id="dk_container_{{ id }}" tabindex="{{ tabindex }}">',
       '<a class="dk_toggle" style="width: {{ width }};">',
         '<span class="dk_label">{{ label }}</span>',
       '</a>',
@@ -96,7 +96,7 @@ function _handleClose() {
 
 // Hide <select>'s that are about to be dropkicked in the face
 // Helps reduce the change of a flash of unstyled content (fouc)
-doc.documentElement.className = doc.documentElement.className + ' dk_fouc';
+// doc.documentElement.className = doc.documentElement.className + ' dk_fouc';
 
 // Bind Events
 $(function () {
@@ -316,7 +316,7 @@ function _scrollMenu(toEl, dkEl) {
   var inner = dkEl.find('.' + dkClasses.menu);
   var to = toEl.prevAll('li').length * toEl.prevAll('li').outerHeight();
 
-  if (to) {
+  if (typeof to === 'number') {
     inner.animate({ scrollTop : to + 'px' }, 0);
   }
 }
@@ -396,10 +396,11 @@ function _renderMenu(tpl, view) {
     dkEl
   ;
 
-  html = html.replace('{{ id }}', view.id);
+  html = html.replace(/{{ id }}/g, view.id);
   html = html.replace('{{ label }}', view.label);
   html = html.replace('{{ tabindex }}', view.tabindex);
   html = html.replace('{{ width }}', view.width);
+  html = html.replace('{{ theme }}', view.theme);
 
   if (options && options.length) {
     for (var i = 0, l = options.length; i < l; i++) {
@@ -425,6 +426,7 @@ methods.init = function (settings) {
   settings = $.extend({}, defaults, settings);
 
   return this.each(function () {
+    console.time('dk_');
 
     // Only allow this to run once
     if ($(this).data('dropkick') && $(this).data('dropkick').id) {
@@ -460,6 +462,9 @@ methods.init = function (settings) {
       // Template variable placeholder
       template   = {},
 
+      // Current theme
+      theme = (settings.theme === defaults.theme) ? defaults.theme : 'dk_theme_' + settings.theme,
+
       // Callbacks that get triggered during certain dkevents
       callbacks  = {
         change : settings.change,
@@ -470,8 +475,7 @@ methods.init = function (settings) {
 
       // Placeholders
       html,
-      dkEl,
-      theme
+      dkEl
     ;
 
     data.selectEl   = el;
@@ -485,27 +489,30 @@ methods.init = function (settings) {
     template.options   = optionTags;
     template.original  = original.val();
     template.width     = width + 'px';
+    template.theme     = theme;
 
     // Turn the template into a real DropKick element
     dkEl = $(_renderMenu(dkTpl, template));
 
     // Hide the <select> and place the dkEl object in front of it
-    el.hide().before(dkEl);
+    el.before(dkEl);
+    el.fadeOut(100, function () {
+      // Stash some data attributes
+      el.data('dropkick', data);
+      dkEl.data('dropkick', data);
+      dkEl.data('dropkick:callbacks', callbacks);
 
-    // Stash some data attributes
-    el.data('dropkick', data);
-    dkEl.data('dropkick', data);
-    dkEl.data('dropkick:callbacks', callbacks);
+      // blur events don't support .live()
+      dkEl.bind('blur.dk', function (e) {
+        $(this).removeClass(dkClasses.focus);
+      });
 
-    // Trigger a dk:load event
-    dkEl.trigger(dkEvent, [{
-      event: dkEvents.load,
-      cb: settings.load,
-      speed: settings.speed
-    }]);
-
-    dkEl.bind('blur.dk', function (e) {
-      $(this).removeClass(dkClasses.focus);
+      // Trigger a dk:load event
+      dkEl.trigger(dkEvent, [{
+        event: dkEvents.load,
+        cb: settings.load,
+        speed: settings.speed
+      }]);
     });
 
     return el;
@@ -513,6 +520,11 @@ methods.init = function (settings) {
 
 };
 
+/**
+ * reset
+ *
+ * Reset all DropKicks and <selects> within their parent form
+ */
 methods.reset = function () {
   var el = $(this), dkEls = el.data('dropkick').parentForm.find('.' + dkClasses.container);
 
