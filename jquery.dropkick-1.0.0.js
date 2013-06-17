@@ -6,7 +6,7 @@
  *
  * &copy; 2011 Jamie Lottering <http://github.com/JamieLottering>
  *                        <http://twitter.com/JamieLottering>
- * 
+ *
  */
 (function ($, window, document) {
 
@@ -18,7 +18,7 @@
   if (!ie6) {
     document.documentElement.className = document.documentElement.className + ' dk_fouc';
   }
-  
+
   var
     // Public methods exposed to $.fn.dropkick()
     methods = {},
@@ -53,7 +53,7 @@
 
     // Some nice default values
     defaults = {
-      startSpeed : 1000,  // I recommend a high value here, I feel it makes the changes less noticeable to the user
+      startSpeed : 0,  // I recommend a high value here, I feel it makes the changes less noticeable to the user
       theme  : false,
       change : false
     },
@@ -261,7 +261,7 @@
     data  = $dk.data('dropkick');
 
     $select = data.$select;
-    $select.val(value);
+    $select.val(value).change();
 
     $dk.find('.dk_label').text(label);
 
@@ -364,11 +364,11 @@
         $dk     = $option.parents('.dk_container').first(),
         data    = $dk.data('dropkick')
       ;
-    
+
       _closeDropdown($dk);
       _updateFields($option, $dk);
       _setCurrent($option.parent(), $dk);
-    
+
       e.preventDefault();
       return false;
     });
